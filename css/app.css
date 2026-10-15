@@ -1,4 +1,4 @@
-/* Flip Tracker — standalone app styles. Glass design ported from the Claude dashboard. */
+/* MS Mobile — standalone app styles. */
 :root { color-scheme: dark; --bg: #060916; }
 *, *::before, *::after { box-sizing: border-box; }
 html { background: var(--bg); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }

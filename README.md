@@ -1,4 +1,4 @@
-# Flip Tracker
+# MS Mobile
 
 Personal phone-flipping tracker, built as an installable web app (PWA). Stock with sell-by targets, profit, price check and a sold-by-model chart.
 

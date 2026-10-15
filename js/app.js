@@ -704,7 +704,7 @@ function exportCsv() {
   const cols = ['no', 'model', 'gb', 'price_paid', 'total_cost', 'bought_on', 'status', 'sold_on', 'sold_price', 'profit', 'note'];
   const esc = (v) => { const s = v === null || v === undefined ? '' : String(v); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const csv = cols.join(',') + '\n' + S.rows.map((r) => cols.map((c) => esc(r[c])).join(',')).join('\n') + '\n';
-  const name = 'flip-tracker-' + D.isoToday() + '.csv';
+  const name = 'ms-mobile-' + D.isoToday() + '.csv';
   const file = new File([csv], name, { type: 'text/csv' });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
     navigator.share({ files: [file], title: name }).catch(() => { /* cancelled */ });
