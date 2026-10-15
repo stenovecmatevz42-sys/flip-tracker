@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flip Tracker</title>
+<meta name="description" content="Personal phone flipping tracker">
+<meta name="theme-color" content="#060916">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Flips">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="ft" id="ft">
+
+  <!-- Login / setup / no-access -->
+  <main class="ft-login" id="login" hidden>
+    <h1 class="ft-title">Flip Tracker</h1>
+    <form class="gl ft-lcard" id="login-form" novalidate>
+      <h2 id="login-h">Sign in</h2>
+      <label class="ft-fld"><span>Email</span><input id="lg-email" type="email" autocomplete="username" autocapitalize="off" spellcheck="false" inputmode="email" required></label>
+      <label class="ft-fld"><span>Password</span><input id="lg-pass" type="password" autocomplete="current-password" minlength="8" required></label>
+      <p class="ft-lerr" id="lg-err" role="alert"></p>
+      <button class="ft-btn pri" id="lg-go" type="submit">Sign in</button>
+      <button class="ft-link" id="lg-mode" type="button">Create account</button>
+    </form>
+    <div class="gl ft-setup" id="noaccess" hidden>
+      <b>No access yet</b>
+      <span id="noaccess-t">This account is not set up as the owner of this tracker.</span>
+      <button class="ft-btn" id="noaccess-out" type="button">Sign out</button>
+    </div>
+    <div class="gl ft-setup" id="setup" hidden>
+      <b>Not connected yet</b>
+      <span>Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> in <code>js/config.js</code>, then reload.</span>
+    </div>
+  </main>
+
+  <!-- App -->
+  <div class="ft-app" id="app" hidden style="display: contents">
+    <header class="ft-head">
+      <div class="ft-top">
+        <button type="button" class="ft-live" id="ft-live" data-state="load" aria-label="Sync now"><i></i><span id="ft-live-t">Syncing</span></button>
+        <div class="ft-icons">
+          <button type="button" class="gl ft-sbtn" id="ft-sbtn" aria-label="Search sold prices" aria-expanded="false" aria-controls="ft-search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+          </button>
+          <button type="button" class="gl ft-sbtn" id="ft-menu" aria-label="Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14"/></svg>
+          </button>
+        </div>
+      </div>
+      <h1 class="ft-title">Flip Tracker</h1>
+      <p class="gl ft-take" id="ft-take"></p>
+    </header>
+
+    <section class="gl ft-search" id="ft-search" aria-label="Price check" hidden>
+      <div class="ft-sfields">
+        <label class="ft-fld"><span>Model</span><input id="ft-q" type="search" placeholder="e.g. 15 Pro" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></label>
+        <label class="ft-fld"><span>Asking price (€)</span><input id="ft-ask" type="text" inputmode="decimal" placeholder="optional" autocomplete="off"></label>
+      </div>
+      <div class="ft-qchips" id="ft-qchips"></div>
+      <div class="ft-res" id="ft-res" aria-live="polite"></div>
+    </section>
+
+    <section class="ft-sec" id="phones-sec">
+      <div class="ft-sech">
+        <h2 id="ft-h">In stock</h2>
+        <div class="gl ft-seg" role="group" aria-label="Show phones">
+          <button type="button" data-view="In stock" aria-pressed="true">In stock</button>
+          <button type="button" data-view="All" aria-pressed="false">All phones</button>
+        </div>
+      </div>
+      <button type="button" class="gl ft-pick" id="ft-pick" hidden></button>
+      <div class="ft-list dash-skeleton" id="ft-list"></div>
+    </section>
+
+    <section class="ft-kpis" id="kpis" aria-label="Headline figures"></section>
+
+    <section class="gl ft-card" id="models-sec">
+      <h2>Phones sold by model</h2>
+      <p class="ft-sub">Share of all sold phones, top seven models, the rest grouped. Tap a model to list its phones.</p>
+      <div class="ft-bars" id="ft-bars"></div>
+    </section>
+
+    <section class="gl ft-card" id="checks-sec" hidden>
+      <h2>Entries to fix</h2>
+      <p class="ft-sub">Rows whose numbers can skew the totals above. Tap a phone in the list to edit it.</p>
+      <div class="ft-scroll">
+        <table class="ft-tbl">
+          <thead><tr><th>No.</th><th>Phone</th><th>Status</th><th>Issue</th></tr></thead>
+          <tbody id="ft-flags"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="ft-foot" id="ft-foot"></p>
+
+    <button type="button" class="gl ft-fab" id="ft-add" aria-label="Add a phone">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+
+  <datalist id="models-dl"></datalist>
+  <div id="ov-host"></div>
+  <div id="toast-host" aria-live="polite"></div>
+</div>
+
+<script src="js/vendor/supabase.js"></script>
+<script src="js/vendor/d3-path.min.js"></script>
+<script src="js/vendor/d3-shape.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
