@@ -117,6 +117,7 @@ function card(u) {
   m.append('No. ' + u.no);
   if (u.bought_label) m.append(' · ' + u.bought_label);
   m.append(' · cost ' + money(u.cost));
+  if (u.battery !== null) m.append(' · battery ' + u.battery + '%');
   if (u.status === 'Sold' && u.days_to_sell !== null) m.append(' · sold in ' + u.days_to_sell + ' d');
   main.append(t, m);
   if (u.status === 'In stock' && u.age !== null) {
@@ -457,6 +458,7 @@ function openDetail(id) {
     const r2 = (k, v) => { const d = el('div'); d.append(el('span', '', k), el('span', '', v)); kv.append(d); };
     r2('Price paid', money2(u.paid));
     r2('Total cost', money2(u.cost));
+    if (u.battery !== null) r2('Battery health', u.battery + '%');
     if (u.status === 'Sold') {
       r2('Sold for', money2(u.sold));
       if (u.sold_label) r2('Sold on', u.sold_label);
@@ -581,7 +583,9 @@ function openForm(id) {
     total.addEventListener('input', () => { totalDirty = true; calc(); });
 
     const bought = input('date', { value: row ? row.bought_on || '' : D.isoToday(), max: D.isoToday() });
-    form.append(field('Bought on', bought));
+    const batt = input('text', { inputmode: 'numeric', autocomplete: 'off', placeholder: 'e.g. 88', maxlength: '3', value: row && row.battery != null ? String(row.battery) : '' });
+    const rb = el('div', 'ft-row2'); rb.append(field('Bought on', bought), field('Battery health (%)', batt));
+    form.append(rb);
 
     // status (edit only)
     let status = row ? row.status : 'in_stock';
@@ -614,7 +618,7 @@ function openForm(id) {
     statusSel.addEventListener('change', calc); soldPrice.addEventListener('input', calc);
     calc();
 
-    form.append(field('Note', Object.assign(el('textarea'), { value: row ? row.note : '', placeholder: 'Battery health, trade details, parts…', rows: 3 })));
+    form.append(field('Note', Object.assign(el('textarea'), { value: row ? row.note : '', placeholder: 'Trade details, repairs, parts…', rows: 3 })));
     const noteEl = form.lastChild.querySelector('textarea');
 
     // photo
@@ -667,8 +671,11 @@ function openForm(id) {
       if (p === null || p < 0) { err.textContent = 'Enter the price paid.'; paid.focus(); return; }
       let t = num(total); if (t === null) t = p;
       if (t < 0) { err.textContent = 'Total cost cannot be negative.'; total.focus(); return; }
+      const bRaw = batt.value.trim().replace('%', '');
+      let bv = null;
+      if (bRaw !== '') { bv = Number(bRaw); if (!Number.isInteger(bv) || bv < 0 || bv > 100) { err.textContent = 'Battery health is a whole number from 0 to 100.'; batt.focus(); return; } }
       const st = u ? statusSel.value : 'in_stock';
-      const values = { model: name, gb: gb || null, price_paid: D.round2(p), total_cost: D.round2(t), bought_on: bought.value || null, status: st, note: noteEl.value.trim(), sold_on: null, sold_price: null, profit: null };
+      const values = { model: name, gb: gb || null, price_paid: D.round2(p), total_cost: D.round2(t), bought_on: bought.value || null, battery: bv, status: st, note: noteEl.value.trim(), sold_on: null, sold_price: null, profit: null };
       if (st === 'sold') {
         const sp = num(soldPrice);
         if (sp === null || sp < 0) { err.textContent = 'Enter the price it sold for.'; soldPrice.focus(); return; }
@@ -701,7 +708,7 @@ function openForm(id) {
 }
 
 function exportCsv() {
-  const cols = ['no', 'model', 'gb', 'price_paid', 'total_cost', 'bought_on', 'status', 'sold_on', 'sold_price', 'profit', 'note'];
+  const cols = ['no', 'model', 'gb', 'battery', 'price_paid', 'total_cost', 'bought_on', 'status', 'sold_on', 'sold_price', 'profit', 'note'];
   const esc = (v) => { const s = v === null || v === undefined ? '' : String(v); return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const csv = cols.join(',') + '\n' + S.rows.map((r) => cols.map((c) => esc(r[c])).join(',')).join('\n') + '\n';
   const name = 'ms-mobile-' + D.isoToday() + '.csv';

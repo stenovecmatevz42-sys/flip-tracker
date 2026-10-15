@@ -1,6 +1,6 @@
 // MS Mobile service worker: keeps the app shell available offline.
 // Network first (so a new deploy shows up immediately), cache as the fallback. Supabase calls are never cached here.
-const CACHE = 'ms-mobile-v4';
+const CACHE = 'ms-mobile-v5';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/api.js', 'js/data.js', 'js/ui.js', 'js/config.js',

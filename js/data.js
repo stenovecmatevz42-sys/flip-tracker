@@ -26,6 +26,7 @@ export function buildUnits(rows, now = new Date()) {
     const total = num(r.total_cost) || 0;
     const profit = num(r.profit);
     const gb = num(r.gb) || 0;
+    const battery = num(r.battery);
     const cost = total > 0 ? total : paid;
     const bought = r.bought_on || null;
     const soldOn = r.sold_on || null;
@@ -38,7 +39,7 @@ export function buildUnits(rows, now = new Date()) {
     }
     return {
       id: r.id, no: Number(r.no), label: r.model, paid, gb, gb_label: SIZES.indexOf(gb) >= 0 ? gb + ' GB' : '',
-      status, db_status: r.status, cost, profit,
+      status, db_status: r.status, cost, profit, battery,
       sold: status === 'Sold' ? (num(r.sold_price) !== null ? Number(r.sold_price) : cost + profit) : null,
       est: /^EST\./i.test(note), note,
       bought_iso: bought, bought_label: dateLabel(bought), days: bought ? sinceDays(bought, now) : null,
