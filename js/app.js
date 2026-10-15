@@ -179,8 +179,8 @@ function renderDonut() {
   bars.classList.remove('dash-skeleton');
   if (!mix.length) { bars.replaceChildren(el('p', 'ft-empty', 'No sold phones yet.')); return; }
   const d3 = window.d3;
-  const PAL = ['#6bb2ff', '#a58bff', '#ff7aa8', '#4fe0c8', '#ffcb66', '#62e8a8', '#ff9a7a'];
-  const tint = (r, i) => (r.other ? 'rgba(214, 222, 255, .55)' : PAL[i % PAL.length]);
+  const PAL = ['#f2f2f2', '#cfcfcf', '#adadad', '#8c8c8c', '#707070', '#575757', '#424242'];
+  const tint = (r, i) => (r.other ? 'rgba(255, 255, 255, .16)' : PAL[i % PAL.length]);
   const total = mix[0].total;
   const cur = mix.filter((r) => !r.other && r.label === model)[0] || null;
   const RO = 112, RI = 74;
@@ -410,7 +410,7 @@ async function resizePhoto(file, W = 240, H = 300, quality = 0.72) {
     const cv = document.createElement('canvas');
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#10152e'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, W, H);
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, W, H);
     return cv.toDataURL('image/jpeg', quality);
